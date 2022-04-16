@@ -13,7 +13,7 @@ export default class EntitiesView extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost/VSV/SAT/API/entities")
+    fetch("/SAT_BRH/API/entities")
       .then((res) => res.json())
       .then(
         (result) => {

@@ -14,10 +14,10 @@ export class NavBar extends React.Component {
         </div>
         <div className="mdc-drawer__content">
           <div className="mdc-list">
-            <NavBarItem to="/home" name={"Home"} icon={"home"} />
-            <NavBarItem to="/areas" name={"Areas"} icon={"room"} />
+            <NavBarItem to="/SAT_BRH/home" name={"Home"} icon={"home"} />
+            <NavBarItem to="/SAT_BRH/areas" name={"Areas"} icon={"room"} />
             <NavBarItem
-              to="/VSV/SAT/devices"
+              to="/SAT_BRH/devices"
               name={"Devices"}
               icon={"settings_ethernet"}
             />

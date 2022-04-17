@@ -18,7 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="./SAT_BRH/home" element={<Home />} />
+            <Route path="/SAT_BRH/home" element={<Home />} />
             <Route path="/SAT_BRH/devices" element={<EntitiesView context={'devices'} />} />
             <Route path="/SAT_BRH/devices/:id" element={<EntityView context={'area'} /> } />
             <Route path="/SAT_BRH/areas" element={<AreasView />} />

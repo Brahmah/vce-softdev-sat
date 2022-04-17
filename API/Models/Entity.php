@@ -5,66 +5,43 @@ class Entity
 {
     // Properties
     public string $id;
-    public string $type;
-    public string $name;
-    public string $campus;
-    public string $area;
-    public string $ipAddress;
-    public string $macAddress;
-    public string $location;
+    public string $type_id;
+    public string|null $area_id;
+    public string|null $campus;
     public string $status;
-    public string $interfaceUrl;
-    public string $adminUsername;
-    public string $adminPassword;
-    public string $briefNotes;
-    public string $purpose;
-    public string $manufacturer;
-    public string $model;
-    public string $serialNumber;
-    public string $os;
-    public string $osVersion;
-    public string $ram_gb;
-    public string $connectionType;
-    public string $patchBuilding;
-    public string $patchPointNumber;
-    public string $patchPointSwitchPort;
-    public string $vlan_id;
-    public string $createdAt;
+    public string|null $name;
+    public string|null $ip_address;
+    public string|null $mac_address;
+    public string|null $serial_number;
+    public string|null $manufacturer;
+    public string|null $model;
+    public string|null $connection_type;
+    public string|null $brief_notes;
+    public string $created_date;
 
     // Fields
-    protected array $fields;
     public array $sections;
+    protected array $fields;
 
     // Constructor
-    public function __construct(string $id)
+
+    public function __construct(array $raw_db_entity)
     {
-        // Set Properties
-        $this->id = $id;
-        $this->type = 'WAP';
-        $this->name = 'Front Office WAP';
-        $this->campus = 'CC';
-        $this->area = '';
-        $this->ipAddress = '10.132.8.33';
-        $this->macAddress = '00:0c:29:c0:00:00';
-        $this->location = 'CC-WAP';
-        $this->status = 'Active';
-        $this->interfaceUrl = 'https://google.com';
-        $this->adminUsername = 'admin';
-        $this->adminPassword = 'password';
-        $this->briefNotes = 'Front Office WAP';
-        $this->purpose = 'Front Office WAP';
-        $this->manufacturer = 'Cisco';
-        $this->model = 'Cisco WAP';
-        $this->serialNumber = '123456789';
-        $this->os = 'IOS';
-        $this->osVersion = '12.4';
-        $this->ram_gb = '4';
-        $this->connectionType = 'ethernet';
-        $this->patchBuilding = 'CC';
-        $this->patchPointNumber = '1';
-        $this->patchPointSwitchPort = '1/1';
-        $this->vlan_id = '1';
-        $this->createdAt = '2020-01-01 00:00:00';
+        // Set Properties, Not doing so dynamically to maintain autocomplete
+        $this->id = $raw_db_entity['id'];
+        $this->type_id = $raw_db_entity['type_id'];
+        $this->area_id = $raw_db_entity['area_id'];
+        $this->campus = $raw_db_entity['campus'];
+        $this->status = $raw_db_entity['status'];
+        $this->name = $raw_db_entity['name'];
+        $this->ip_address = $raw_db_entity['ip_address'];
+        $this->mac_address = $raw_db_entity['mac_address'];
+        $this->serial_number = $raw_db_entity['serial_number'];
+        $this->manufacturer = $raw_db_entity['manufacturer'];
+        $this->model = $raw_db_entity['model'];
+        $this->connection_type = $raw_db_entity['connection_type'];
+        $this->brief_notes = $raw_db_entity['brief_notes'];
+        $this->created_date = $raw_db_entity['created_date'];
         // Populate Fields
         $this->populateFields();
         // Populate Sections
@@ -75,28 +52,19 @@ class Entity
     private function populateFields()
     {
         $this->fields = [
-            new EntityField("id", $this->id, "0", fieldSectionType::hidden, "text", null, []),
-            new EntityField("Device Type", $this->type, "WAP", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Device Type", $this->type_id, "WAP", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Area", $this->area_id, "1", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Campus", $this->campus, "DP", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Status", $this->status, "Active", fieldSectionType::overview, "text", 250, []),
             new EntityField("Name", $this->name, "Test Device", fieldSectionType::overview, "text", 250, []),
-            new EntityField("Campus", $this->campus, "Test Campus", fieldSectionType::overview, "text", 250, []),
-            new EntityField("Area", $this->area, "Test Area", fieldSectionType::overview, "text", 250, []),
-            new EntityField("IP Address", $this->ipAddress, "10.124.96.XX", fieldSectionType::overview, "text", 250, []),
-            new EntityField("MAC Address", $this->macAddress, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("Serial Number", $this->serialNumber, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("Model", $this->model, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("OS", $this->os, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("OS Version", $this->osVersion, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("RAM (GB)", $this->ram_gb, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("Connection Type", $this->connectionType, "", fieldSectionType::connectivity, "text", 250, []),
-            new EntityField("Patch Building", $this->patchBuilding, "", fieldSectionType::connectivity, "text", 250, []),
-            new EntityField("Patch Number", $this->patchPointNumber, "", fieldSectionType::connectivity, "text", 250, []),
-            new EntityField("Patch Switch Port", $this->patchPointSwitchPort, "", fieldSectionType::connectivity, "text", 250, []),
-            new EntityField("VLAN ID", $this->vlan_id, "", fieldSectionType::connectivity, "text", 250, []),
-            new EntityField("Brief Notes", $this->briefNotes, "", fieldSectionType::overview, "text", 250, []),
-            new EntityField("Purpose", $this->purpose, "", fieldSectionType::overview, "text", 250, []),
-            new EntityField("Manufacturer", $this->manufacturer, "", fieldSectionType::specs, "text", 250, []),
-            new EntityField("Created At", $this->createdAt, "", fieldSectionType::overview, "date", 250, []),
-            new EntityField("Status", $this->status, "", fieldSectionType::overview, "select", 250, [])
+            new EntityField("IP Address", $this->ip_address, "10.132.8.33", fieldSectionType::overview, "text", 250, []),
+            new EntityField("MAC Address", $this->mac_address, "00:00:00:00:00:00", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Serial Number", $this->serial_number, "123456789", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Manufacturer", $this->manufacturer, "Test Manufacturer", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Model", $this->model, "Test Model", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Connection Type", $this->connection_type, "WAP", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Brief Notes", $this->brief_notes, "Test Notes", fieldSectionType::overview, "text", 250, []),
+            new EntityField("Created Date", $this->created_date, "2020-01-01", fieldSectionType::overview, "text", 250, []),
         ];
         // set parentEntityId for each field
         foreach ($this->fields as $field) {

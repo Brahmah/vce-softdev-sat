@@ -13,7 +13,7 @@ export default class AreasView extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost/VSV/SAT/API/areas.php")
+    fetch("/SAT_BRH/API/areas")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -72,7 +72,7 @@ function AreaCard(props) {
   const area = props.area;
 
   function handleClick() {
-    navigate("/areas/" + area.id);
+    navigate("/SAT_BRH/areas/" + area.id);
   }
 
   return (

@@ -8,6 +8,12 @@
 
 // might as well start the session.
 session_start();
+try {
+    $_SESSION["csrf"] = bin2hex(random_bytes(32));
+} catch (Exception $e) {
+    $_SESSION["csrf"] = bin2hex(openssl_random_pseudo_bytes(32));
+}
+
 // mapping the route methods
 function get($route, $path_to_include)
 {

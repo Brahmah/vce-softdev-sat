@@ -19,7 +19,7 @@ export default class EntitiesView extends React.Component {
         (result) => {
           this.setState({
             isLoaded: true,
-            entities: result.list,
+            entities: result.entities,
           });
         },
         // Note: it's important to handle errors here
@@ -60,13 +60,13 @@ export default class EntitiesView extends React.Component {
               <tr>
                 <th>IP</th>
                 <th>Name</th>
-                <th>LOCATION</th>
+                <th>Area</th>
                 <th>Notes</th>
               </tr>
             </thead>
             <tbody>
               {this.state.entities.map((entity) => (
-                <EntityRow entity={entity} key={entity.DEVICE_ID} />
+                <EntityRow entity={entity} key={entity.id} />
               ))}
             </tbody>
           </table>
@@ -81,15 +81,15 @@ function EntityRow(props) {
   const entity = props.entity;
 
   function handleClick() {
-    navigate("/devices/" + entity.DEVICE_ID);
+    navigate("/SAT_BRH/devices/" + entity.id);
   }
 
   return (
     <tr onClick={handleClick}>
-      <td {...{ "td-online-badge": "somevalue" }} >{entity.IP_ADDRESS}</td>
-      <td>{entity.NAME}</td>
-      <td>{entity.LOCATION}</td>
-      <td>{entity.NOTES}</td>
+      <td {...{ "td-online-badge": "somevalue" }} >{entity.ip_address}</td>
+      <td>{entity.name}</td>
+      <td>{entity.area_id}</td>
+      <td>{entity.brief_notes}</td>
     </tr>
   );
 }

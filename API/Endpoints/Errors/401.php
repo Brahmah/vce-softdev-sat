@@ -4,6 +4,7 @@ header('Content-Type: application/json');
 header('HTTP/1.1 401 Unauthorized');
 $response = [
     'status' => 'error',
+    'success' => false,
     'message' => 'Unauthorized you fool!'
 ];
 echo json_encode($response);

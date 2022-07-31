@@ -1,79 +1,66 @@
-import React from "react";
+/**
+ * This component renders the right-side entity uptime chart along with the activity items
+ * relevant to the passed though entity id.
+ *
+ * @author Bashir Rahmah <brahmah90@gmail.com>
+ * @copyright Bashir Rahmah 2022
+ *
+ */
+import React, {useEffect} from "react";
 import UptimeChart from "./uptimeChart";
+import {ActivityItemBodyBuilder} from "./activityList";
+import $ from "jquery";
 
-export default class EntitySideDetail extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: null,
-      isLoaded: false,
-      activity: [],
-    };
-  }
+export default function EntitySideDetail({entityId}) {
+    const [activity, setActivity] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
-  componentDidMount() {
-    fetch(
-      `http://localhost/VSV/SAT/API/getEntityActivity.php?entityId=${this.props.entityId}`
-    )
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            isLoaded: true,
-            activity: result.list,
-          });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({
-            isLoaded: true,
-            error: "Error loading entities",
-          });
-        }
-      );
-  }
+    function reloadActivity() {
+        setIsLoading(true);
+        $.get(`/SAT_BRH/API/activity/entity/${entityId}`, function (data, status) {
+            setIsLoading(false);
+            if (status === 'success') {
+                setActivity(data.activity);
+            }
+        });
+    }
 
-  render() {
+    useEffect(() => {
+        reloadActivity();
+    }, [entityId])
+
     return (
-      <div className="class-detail side-detail">
-        <UptimeChart entityId={this.props.entityId} />
+        <div className="detail-pane side-detail">
+            <UptimeChart entityId={entityId}/>
 
-        <h5>Activity</h5>
+            <h5>Activity</h5>
 
-        {this.state.isLoaded ? (
-          <div>
-            {this.state.activity.map((item, index) => (
-              <div
-                className={"inbox-task " + (item.isRecent ? "recentFeed" : "")}
-                key={item.id}
-              >
-                <div className="forms">
-                  <div className="min_foto">
-                    <img
-                      className="dwimg"
-                      src={item.image}
-                      alt={"profile picture"}
-                    />
-                  </div>
-                  <h5>
-                    <span>{item.title}</span>
-                  </h5>
-                  <h4>
-                    <span>{item.description}</span>
-                  </h4>
-                  <h5>
-                    <span>{item.relativeTime}</span>
-                  </h5>
+            {isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                <div>
+                    {activity.map((item, index) => (
+                        <div
+                            className={"inbox-task " + (item.is_recent ? "recentFeed" : "")}
+                            key={item.id}
+                        >
+                            <div className="forms">
+                                <h5>
+                                    <span>{item.relative_date}</span>
+                                </h5>
+                                <h4>
+                                    <span>
+                                        <ActivityItemBodyBuilder body_builder={item.body_builder} />
+                                    </span>
+                                </h4>
+                                <h5>
+                                    <span>{String(item.context).toUpperCase()}</span>
+                                </h5>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div>Loading...</div>
-        )}
-      </div>
+            )}
+        </div>
     );
-  }
 }

@@ -1,20 +1,5 @@
 <?php
 
-enum extraValidationTypes: string
-{
-    case IP = "IP";
-    case MAC = "MAC";
-    case AREA = "AREA";
-}
-
-enum fieldSectionType: string
-{
-    case overview = "Overview";
-    case specs = "Specifications";
-    case connectivity = "Connectivity";
-    case hidden = "Hidden";
-}
-
 class EntityFieldValidationResult
 {
     public bool $valid;
@@ -31,19 +16,25 @@ class EntityFieldValidationResult
 
 class EntityField
 {
+    public string $dbFieldName;
     public string $label;
     public string|int|null $value;
     public string $placeholder;
-    public fieldSectionType $section;
+    public string $section;
     public string $type;
     public int|null $maxLength;
-    public array $extraValidations;
+    public array $extraValidations; // Array of additional validations (e.g. ["IP", "MAC", "STORAGE_UNIT"])
     public string $htmlId;
     public string $eventListen;
-    public string $parentEntityId;
+    public int|null $parentEntityId;
+    public bool $isCustom;
+    public bool $isEditable;
 
-    public function __construct(string $label, string|int|null $value, string $placeholder, fieldSectionType $section, string $type, int|null $maxLength = null, array $extraValidations = [])
+    public function __construct(string $dbFieldName, bool $isEditable, string $label, string|int|null $value, string $placeholder, string $section, string $type, int|null $maxLength = null, array $extraValidations = [], int|null $parentEntityId = null)
     {
+        $this->isCustom = false;
+        $this->isEditable = $isEditable;
+        $this->dbFieldName = $dbFieldName;
         $this->label = $label;
         $this->value = $value;
         $this->placeholder = $placeholder;
@@ -51,12 +42,26 @@ class EntityField
         $this->type = $type;
         $this->maxLength = $maxLength;
         $this->extraValidations = $extraValidations;
-        $this->parentEntityId = '';
-        // generate html id as section and label with no spaces
-        $this->htmlId = str_replace(" ", "", $this->section->value) . "-" . str_replace(" ", "", $label);
+        $this->parentEntityId = $parentEntityId;
+        $this->finaliseConstruct();
+    }
+
+    /**
+     * Set rest of field parameters.
+     * @return void
+     */
+    public function finaliseConstruct()
+    {
+        $this->htmlId = $this->dbFieldName;
+        if (isset($this->definitionId) && $this->isCustom) {
+            $this->htmlId .= $this->definitionId;
+        } else {
+            // generate html id as section and label with no spaces
+            $this->htmlId = str_replace(" ", "", $this->section) . "-" . str_replace(" ", "", $this->label);
+        }
         $this->htmlId = hash("md5", $this->htmlId);
         // appropriate event listener
-        $this->eventListen = match ($type) {
+        $this->eventListen = match ($this->type) {
             "text" => "keyup",
             "number" => "keyup",
             "password" => "keyup",
@@ -68,20 +73,23 @@ class EntityField
         };
     }
 
-    // Validations
-    public function validate(string $newValue): EntityFieldValidationResult
+    /**
+     * @param $newValue
+     * @return EntityFieldValidationResult
+     */
+    public function validate($newValue): EntityFieldValidationResult
     {
         // validate max length
         if (strlen($newValue) > $this->maxLength) {
             return new EntityFieldValidationResult(false, 'Max length is ' . $this->maxLength, "red");
         } // validate number
-        else if ($this->type == 'number' && !is_numeric($_GET['value'])) {
+        else if ($this->type == 'number' && !is_numeric($newValue)) {
             return new EntityFieldValidationResult(false, 'Must be a number', "red");
         } // validate text
-        else if ($this->type == 'text' && !is_string($_GET['value'])) {
+        else if ($this->type == 'text' && !is_string($newValue)) {
             return new EntityFieldValidationResult(false, 'Must be text', "red");
         } // validate checkbox
-        else if ($this->type == 'checkbox' && !is_bool($_GET['value'])) {
+        else if ($this->type == 'checkbox' && !is_bool($newValue)) {
             return new EntityFieldValidationResult(false, 'Must be a boolean', "red");
         } // success
         else {
@@ -89,4 +97,26 @@ class EntityField
         }
     }
 
+}
+
+class CustomEntityField extends EntityField
+{
+    public int $definitionId;
+
+    public function __construct(array $rawDbField, int $parentEntityId)
+    {
+        $this->isCustom = true;
+        $this->isEditable = true;
+        $this->dbFieldName = 'custom_' . $rawDbField['definition_id'];
+        $this->definitionId = $rawDbField['definition_id'];
+        $this->label = $rawDbField['label'];
+        $this->value = $rawDbField['field_value'];
+        $this->placeholder = $rawDbField['placeholder'];
+        $this->section = $rawDbField['section'];
+        $this->type = $rawDbField['type'];
+        $this->maxLength = $rawDbField['max_length'];
+        $this->extraValidations = [];
+        $this->parentEntityId = $parentEntityId;
+        $this->finaliseConstruct();
+    }
 }

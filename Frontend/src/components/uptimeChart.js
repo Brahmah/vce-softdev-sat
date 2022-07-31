@@ -1,124 +1,106 @@
-import React from "react";
-import { Line } from "react-chartjs-2";
+/**
+ * Renders an uptime chart.
+ *
+ * @author Bashir Rahmah <brahmah90@gmail.com>
+ * @copyright Bashir Rahmah 2022
+ *
+ */
+import React, {useEffect, useState} from "react";
+import {Line} from "react-chartjs-2";
+import $ from 'jquery';
 import {
-  Chart as ChartJS,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
 } from "chart.js";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
 );
 
 const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top",
+    responsive: true,
+    plugins: {
+        legend: {
+            position: "top",
+        },
+        title: {
+            display: false,
+        },
     },
-    title: {
-      display: false,
-    },
-  },
-  scales: { y: { max: 105, min: 0, ticks: { beginAtZero: true } } },
+    scales: {y: {max: 105, min: 0, ticks: {beginAtZero: true}}},
 };
 
 const loadingChart = {
-  data: {
-    labels: [...Array(10).keys()].map((x) => "Loading..."),
-    datasets: [
-      {
-        label: "Uptime",
-        data: [0],
-        borderColor: "grey",
-        backgroundColor: "grey",
-      },
-    ],
-  },
+    data: {
+        labels: [...Array(10).keys()].map((x) => "Loading..."),
+        datasets: [
+            {
+                label: "Uptime",
+                data: [0],
+                borderColor: "grey",
+                backgroundColor: "grey",
+            },
+        ],
+    },
 };
 
-export default class UptimeChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.toggleSelectedChartType = this.toggleSelectedChartType.bind(this); // https://stackoverflow.com/a/32317459
-    this.state = {
-      chartType: "Hourly",
-      uptimeChart: loadingChart,
-    };
-  }
+export default function UptimeChart({entityId}) {
+    const [chartType, setChartType] = useState('Hourly')
+    const [chart, setChart] = useState(loadingChart.data)
 
-  componentDidMount() {
-    this.getUptime();
-  }
-
-  getUptime() {
-    this.setState({
-      uptimeChart: loadingChart,
-    });
-    fetch(
-      `http://localhost/VSV/SAT/API/getEntityUptime.php?id=${this.props.entityId}&type=${this.state.chartType}`
-    )
-      .then((res) => res.json())
-      .then((result) => {
-        this.setState({
-          uptimeChart: {
-            data: result.data,
-          },
-        });
-      });
-  }
-
-  toggleSelectedChartType() {
-    if (this.state.chartType === "Hourly") {
-      this.setState({
-        chartType: "Daily",
-      });
-    } else {
-      this.setState({
-        chartType: "Hourly",
-      });
+    function getUptime() {
+        setChart(loadingChart.data)
+        $.get(`/SAT_BRH/API/entities/${entityId}/uptime/${chartType}`, function (response) {
+            setChart(response.data)
+        })
     }
-    this.getUptime();
-  }
 
-  render() {
+    useEffect(() => {
+        getUptime();
+    }, [chartType])
+
+    function toggleSelectedChartType() {
+        setChartType(chartType === 'Hourly' ? 'Daily' : 'Hourly')
+    }
+
     return (
-      <div>
-        <h5>
-          <span>Uptime</span>
-          <a
-            className="link"
-            style={{ float: "right" }}
-            onClick={this.toggleSelectedChartType}
-          >
-            {this.state.chartType}
-          </a>
-        </h5>
+        <div>
+            <h5>
+                <span>Uptime</span>
+                <a
+                    className="link"
+                    style={{float: "right"}}
+                    onClick={toggleSelectedChartType}
+                >
+                    {chartType}
+                </a>
+            </h5>
 
-        <Line
-          options={options}
-          data={this.state.uptimeChart.data}
-          width={"656px"}
-          height={"328px"}
-          style={{
-            display: "block",
-            boxSizing: "border-box",
-            height: "164px",
-            width: "328px",
-          }}
-        />
-      </div>
+            <Line
+                options={options}
+                data={chart}
+                width={"656px"}
+                height={"328px"}
+                style={{
+                    display: "block",
+                    boxSizing: "border-box",
+                    height: "164px",
+                    width: "328px",
+                }}
+                type={'line'}
+            />
+        </div>
     );
-  }
 }

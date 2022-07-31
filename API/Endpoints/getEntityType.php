@@ -1,4 +1,14 @@
 <?php
+/**
+ * Get an entity type
+ *
+ * Get field definitions for an entity type along with the entity type itself.
+ * The field definitions describe the fields that are available for each entity type.
+ *
+ * @author Bashir Rahmah <brahmah90@gmail.com>
+ * @copyright Bashir Rahmah 2022
+ *
+ */
 /* Imports */
 require_once './API/Helpers/initDatabaseConnection.php';
 
@@ -12,56 +22,32 @@ $db = getConnection();
 header("Content-Type: application/json; charset=UTF-8");
 
 /* Get Entity Types */
-$entityTypesResult = $db->query("SELECT * FROM entity_types;");
-$entityTypes = array();
-if ($entityTypesResult->num_rows > 0) {
-    while ($row = $entityTypesResult->fetch_assoc()) {
-        $row['created_date_friendly'] = date('D j M o, g:i a', (int)$row['type_created_timestamp']);
-        $entityTypes[] = $row;
-    }
+$entityTypePrepared = $db->prepare("SELECT * FROM entity_types where entity_type_id = ?;");
+$entityTypePrepared->bind_param("s", $typeId);
+$entityTypePrepared->execute();
+$entityTypeResult = $entityTypePrepared->get_result();
+$rawDbEntityType = $entityTypeResult->fetch_assoc();
+
+if (!$rawDbEntityType) {
+//    http_response_code(404);
+    echo json_encode(array("success" => false, "message" => "Entity Type not found."));
+    exit();
 }
 
-/* Get Summary Of Entity Types */
-$entityTypesSummaryResult = $db->query("SELECT type_id, COUNT(*) FROM entities GROUP BY type_id;");
-$entityTypesSummary = array();
-if ($entityTypesSummaryResult->num_rows > 0) {
-    while ($row = $entityTypesSummaryResult->fetch_assoc()) {
-        $entityTypesSummary[] = $row;
-    }
-}
-
-/* Get Summary Of Entity Type Definitions */
-$entityTypeDefinitionsSummaryResult = $db->query("SELECT entity_type_id, COUNT(*) FROM entity_field_definitions GROUP BY entity_type_id;");
-$entityTypeDefinitionsSummary = array();
-if ($entityTypeDefinitionsSummaryResult->num_rows > 0) {
-    while ($row = $entityTypeDefinitionsSummaryResult->fetch_assoc()) {
-        $entityTypeDefinitionsSummary[] = $row;
-    }
-}
-
-/* Set Summary Of Entity Types & Definitions */
-foreach ($entityTypes as $key => $entityType) {
-    $entityTypes[$key]['entity_count'] = 0;
-    $entityTypes[$key]['definition_count'] = 0;
-    foreach ($entityTypesSummary as $entityTypeSummary) {
-        if ($entityType['entity_type_id'] == $entityTypeSummary['type_id']) {
-            $entityTypes[$key]['entity_count'] = (int)$entityTypeSummary['COUNT(*)'];
-        }
-    }
-    foreach ($entityTypeDefinitionsSummary as $entityTypeDefinitionSummary) {
-        if ($entityType['entity_type_id'] == $entityTypeDefinitionSummary['entity_type_id']) {
-            $entityTypes[$key]['definition_count'] = (int)$entityTypeDefinitionSummary['COUNT(*)'];
-        }
-    }
-}
+/* Get Entity Field Definitions */
+$entityTypeDefinitionsPrepared = $db->prepare("SELECT * FROM entity_field_definitions where entity_type_id = ?;");
+$entityTypeDefinitionsPrepared->bind_param("s", $typeId);
+$entityTypeDefinitionsPrepared->execute();
+$entityTypeDefinitionsResult = $entityTypeDefinitionsPrepared->get_result();
+$rawDbEntityTypeDefinitions = $entityTypeDefinitionsResult->fetch_all(MYSQLI_ASSOC);
 
 /* Send to client */
 $result = [
-    "entity_types" => $entityTypes,
-    "count" => count($entityTypes)
+    ...$rawDbEntityType,
+    "type_definitions" => $rawDbEntityTypeDefinitions,
+    "count" => $entityTypeDefinitionsResult->num_rows,
 ];
 
 /* Send to client */
 http_response_code(200);
 echo json_encode($result);
-

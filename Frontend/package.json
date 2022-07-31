@@ -2,8 +2,10 @@
   "name": "vsv-react-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "./Frontend/build",
+  "homepage": "SAT_BRH/Frontend/build",
   "dependencies": {
+    "@bartaxyz/react-tree-list": "^0.5.0",
+    "@szhsin/react-menu": "^3.1.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.0.1",
     "@testing-library/user-event": "^13.5.0",
@@ -12,9 +14,12 @@
     "react": "^18.0.0",
     "react-autosave": "^0.3.1",
     "react-chartjs-2": "^4.1.0",
+    "react-csv": "^2.2.2",
     "react-dom": "^18.0.0",
+    "react-modal": "^3.15.1",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "react-toastify": "^9.0.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -42,6 +47,6 @@
     ]
   },
   "devDependencies": {
-    "prettier": "^2.6.2"
+    "prettier": "^2.7.1"
   }
 }

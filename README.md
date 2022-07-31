@@ -20,6 +20,7 @@ Please restore the database from the provided file in the /Database directory.
 
 # Web Access Credentials:
 Username: VSV
+
 Password: tHESk00l.2.Be.@
 
 # What could have been done better:

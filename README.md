@@ -32,3 +32,7 @@ Password: tHESk00l.2.Be.@
 - Classes should have been implemented to handle all CRUD operations on the database.
 - Project structure should have been organized by controllers, models, and utils.
 - Middleware should have been implemented to handle all authentication and authorization.
+
+Ultimately, this programme was created for a VCE Project Management course that has a significant software development component, and it is more than able to pass the assessment requirements for that criterion. The software component was allocated very little time, as prevelant in the quality of this 'software solution'.
+
+This was submitted on 28/7/2022, the repository will only be public once the SAT is graded.  

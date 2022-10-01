@@ -1,5 +1,11 @@
 # Screenshots
-![](https://github.com/brahmah/VCE-SOFTDEV-SAT/Screenshots/SCR-20221001-na0)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-naw.jpeg?raw=true)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-nb4.jpeg?raw=true)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-nbi.jpeg?raw=true)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-na0.jpeg?raw=true)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-nag.jpeg?raw=true)
+![](https://github.com/Brahmah/vce-softdev-sat/blob/main/Screenshots/SCR-20221001-nap.jpeg?raw=true)
+
 
 # Expected File Structure
 - 📁 htdocs

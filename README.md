@@ -1,3 +1,6 @@
+# Screenshots
+![](https://github.com/brahmah/VCE-SOFTDEV-SAT/Screenshots/SCR-20221001-na0)
+
 # Expected File Structure
 - 📁 htdocs
 - - 📁 SAT_BRH
